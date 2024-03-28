@@ -11,7 +11,7 @@ import UserRoutes from './Kanbas/users/routes.js';
 import AssignmentRoutes from './Kanbas/assignments/routes.js';
 
 const corsOptions = {
-    origin: 'http://localhost:3000', // allow requests from this origin
+    origin: [process.env.FRONTEND_URL, "http://localhost:3000"], // allow requests from this origin
     credentials: true, // allow cookies to be sent with the request
 };
 
