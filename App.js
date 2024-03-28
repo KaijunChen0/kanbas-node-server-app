@@ -14,6 +14,7 @@ const corsOptions = {
     origin: [process.env.FRONTEND_URL, "http://localhost:3000"], // allow requests from this origin
     credentials: true, // allow cookies to be sent with the request
 };
+console.log("corsOptions origin:", corsOptions.origin);
 
 const app = express();
 app.use(cors(corsOptions)); // use the cors() middleware to allow cross-origin requests, must be before the express.json() middleware, order matters!!!
