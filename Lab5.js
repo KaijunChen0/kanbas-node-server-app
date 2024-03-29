@@ -69,7 +69,7 @@ export default function Lab5(app){
             default:
                 res.send("Invalid operation");
         }
-        res.send(query);
+        // res.send(query);
     });
     app.get("/a5/assignment", (req, res) => {
         res.json(assignment);
