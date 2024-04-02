@@ -2,13 +2,16 @@
 import express from 'express'; // ES6 syntax to import express library by add `type` in the `package.json` file to `module` to use ES6 syntax rather than the old `require` syntax
 import Hello from './Hello.js';
 import Lab5 from './Lab5.js';
-import CourseRoutes from './Kanbas/courses/routes.js';
+import CourseRoutes from './Courses/routes.js';
 import cors from 'cors'; // import the cors library to allow cross-origin requests
 import ModuleRoutes from './Kanbas/modules/routes.js';
 import session from 'express-session';
 import SecurityController from './SecurityController.js';
-import UserRoutes from './Kanbas/users/routes.js';
+import UserRoutes from './Users/routes.js';
 import AssignmentRoutes from './Kanbas/assignments/routes.js';
+import mongoose from 'mongoose';// import the mongoose library to connect to the MongoDB database
+
+mongoose.connect("mongodb://localhost:27017/kanbas");// connect to the MongoDB database using the mongoose.connect() function and pass the connection string as an argument with port and database name
 
 const corsOptions = {
     origin: [process.env.FRONTEND_URL, "http://localhost:3000"], // allow requests from this origin

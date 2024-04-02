@@ -1,15 +1,20 @@
-import db from "../Database/index.js";
+// import db from "../Kanbas/Database/index.js";
 
 export default function UserRoutes(app){
     app.get("/api/users", (req, res) => {
         const users = db.users;
         res.send(users);
     });
-    app.get("/api/users/register/:username/:password", (req, res) => {
-        const { username, password } = req.params;
-        const newUser = { username, password };
+    app.post("/api/users/register", (req, res) => {
+        const { username, password } = req.body;
+        if (db.users.find(user => user.username === username)){
+            res.status(400).send("Username already exists");
+            return;
+        }
+        const newUser = { username, password, _id:Date.now().toString()};
         db.users.push(newUser);
-        req.session.currentUser = newUser;
+        // req.session.currentUser = newUser;
+        req.session["currentUser"] = newUser; // same as req.session.currentUser = newUser;
         res.send(newUser);
     });
     app.get("/api/users/profile", (req, res) => {
@@ -19,12 +24,12 @@ export default function UserRoutes(app){
         }
         res.send(req.session.currentUser);
     });
-    app.get("/api/users/logout", (req, res) => {
+    app.post("/api/users/logout", (req, res) => {
         req.session.destroy();
         res.send("logged out");
     });
-    app.get("/api/users/login/:username/:password", (req, res) => {
-        const { username, password } = req.params;
+    app.post("/api/users/login", (req, res) => {
+        const { username, password } = req.body;
         const user = db.users.find(user => user.username === username && user.password === password);
         if(user){
             req.session.currentUser = user;
