@@ -4,14 +4,17 @@ import Hello from './Hello.js';
 import Lab5 from './Lab5.js';
 import CourseRoutes from './Courses/routes.js';
 import cors from 'cors'; // import the cors library to allow cross-origin requests
-import ModuleRoutes from './Kanbas/modules/routes.js';
+import ModuleRoutes from './Modules/routes.js';
 import session from 'express-session';
 import SecurityController from './SecurityController.js';
 import UserRoutes from './Users/routes.js';
 import AssignmentRoutes from './Kanbas/assignments/routes.js';
 import mongoose from 'mongoose';// import the mongoose library to connect to the MongoDB database
+import "dotenv/config";
 
-mongoose.connect("mongodb://localhost:27017/kanbas");// connect to the MongoDB database using the mongoose.connect() function and pass the connection string as an argument with port and database name
+// mongoose.connect("mongodb://localhost:27017/kanbas");// connect to the MongoDB database using the mongoose.connect() function and pass the connection string as an argument with port and database name
+const CONNECTION_STRING = process.env.DB_CONNECTION_STRING || 'mongodb://localhost:27017/kanbas';// or 'mongodb://127.0.0.1:27017/kanbas'
+mongoose.connect(CONNECTION_STRING);
 
 const corsOptions = {
     origin: [process.env.FRONTEND_URL, "http://localhost:3000"], // allow requests from this origin
@@ -24,13 +27,19 @@ app.use(cors(corsOptions)); // use the cors() middleware to allow cross-origin r
 app.use(express.json()); // use the express.json() middleware to parse the json body of the request
 // const session = require('express-session');
 // app.set('trust proxy', 1); // trust first proxy
-app.use(session({
-    secret: 'keyboard cat',
-    // secret: process.env.SECRET,
-    // resave: false,
-    // saveUninitialized: true,
-    // cookie: { secure: true } // secure cookie only works with https
-}));
+const sessionOptions = {
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+};
+if (process.env.NODE_ENV !== "development") {
+    sessionOptions.proxy = true;
+    sessionOptions.cookie = {
+      sameSite: "none",
+      secure: true,
+    };
+};  
+app.use(session(sessionOptions));
 SecurityController(app); // call the function `SecurityController` and pass the `app` object to it
 
 Hello(app); // call the function `Hello` and pass the `app` object to it

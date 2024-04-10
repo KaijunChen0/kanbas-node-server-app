@@ -1,10 +1,16 @@
 // import db from "../Kanbas/Database/index.js";
 import * as dao from "./dao.js";
 
-let currentUser = null;
+// let currentUser = null;
 
 export default function UserRoutes(app){
     app.get("/api/users", async (req, res) => {
+        const { role } = req.query;
+        if (role) {
+            const users = await dao.findUsersByRole(role);
+            res.json(users);
+            return;
+        };
         // const users = db.users;
         const users = await dao.findAllUsers();
         res.send(users);
@@ -29,7 +35,7 @@ export default function UserRoutes(app){
         const { username, password } = req.body;
         const existingUser = await dao.findUserByCredentials(username, password);
         if (existingUser){
-            res.status(400).send("Username already exists");
+            res.status(400).json({ message: "Username already taken" });
             return;
         }
         // const newUser = { username, password, _id:Date.now().toString()};
@@ -40,11 +46,12 @@ export default function UserRoutes(app){
         res.send(newUser);
     });
     app.post("/api/users/profile", async (req, res) => {
-        if(!req.session.currentUser){
+        const currentUser = req.session.currentUser;
+        if(!currentUser){
             res.status(401).send("Not logged in"); //switch different browser, the same user need to register again
             return;
         }
-        res.send(req.session.currentUser);
+        res.send(currentUser);
     });
     app.post("/api/users/logout", async (req, res) => {
         req.session.destroy();
@@ -62,4 +69,10 @@ export default function UserRoutes(app){
             res.status(401).send("Invalid username or password");
         }
     });
+    const deleteUser = async (req, res) => {
+        const status = await dao.deleteUser(req.params.userId);
+        res.json(status);
+    };
+    app.delete("/api/users/:userId", deleteUser);
+
 }
