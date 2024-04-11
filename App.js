@@ -17,7 +17,8 @@ const CONNECTION_STRING = process.env.DB_CONNECTION_STRING || 'mongodb://localho
 mongoose.connect(CONNECTION_STRING);
 
 const corsOptions = {
-    origin: [process.env.FRONTEND_URL, "http://localhost:3000"], // allow requests from this origin
+    // origin: [process.env.FRONTEND_URL, "http://localhost:3000"], // allow requests from this origin
+    origin: process.env.FRONTEND_URL,
     credentials: true, // allow cookies to be sent with the request
 };
 console.log("corsOptions origin:", corsOptions.origin);
