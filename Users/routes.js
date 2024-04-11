@@ -2,6 +2,7 @@
 import * as dao from "./dao.js";
 
 // let currentUser = null;
+let globalCurrentUser;
 
 export default function UserRoutes(app){
     app.get("/api/users", async (req, res) => {
@@ -43,10 +44,12 @@ export default function UserRoutes(app){
         // req.session.currentUser = newUser;
         const newUser = await dao.createUser({ username, password });
         req.session["currentUser"] = newUser; // same as req.session.currentUser = newUser;
+        globalCurrentUser = newUser;
         res.send(newUser);
     });
     app.post("/api/users/profile", async (req, res) => {
-        const currentUser = req.session.currentUser;
+        let currentUser = req.session.currentUser;
+        currentUser = globalCurrentUser;
         if(!currentUser){
             res.status(401).send("Not logged in"); //switch different browser, the same user need to register again
             return;
@@ -56,6 +59,7 @@ export default function UserRoutes(app){
     app.post("/api/users/logout", async (req, res) => {
         req.session.destroy();
         res.send("logged out");
+
     });
     app.post("/api/users/login", async (req, res) => {
         const { username, password } = req.body;
@@ -64,6 +68,7 @@ export default function UserRoutes(app){
         await dao.findUserByCredentials(username, password);
         if(user){
             req.session.currentUser = user;
+            globalCurrentUser = user;
             res.send(user);
         } else {
             res.status(401).send("Invalid username or password");
